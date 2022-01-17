@@ -121,6 +121,8 @@ namespace glfw
     // Returns 0 if not found
     IGL_INLINE size_t mesh_index(const int id) const;
 
+    IGL_INLINE void Fabrik_Loop();
+
 	Eigen::Matrix4d CalcParentsTrans(int indx);
 	inline bool SetAnimation() { return isActive = !isActive; }
 public:
@@ -131,6 +133,8 @@ public:
     // Alec: I call this data_list instead of just data to avoid confusion with
     // old "data" variable.
     // Stores all the data that should be visualized
+
+
     std::vector<ViewerData> data_list;
 	
 	std::vector<int> parents;
@@ -139,6 +143,9 @@ public:
     int next_data_id;
 	bool isPicked;
 	bool isActive;
+    bool isMoving = false;
+    Eigen::Vector3d dir = Eigen::Vector3d(0.005, 0, 0);
+
 
     
 

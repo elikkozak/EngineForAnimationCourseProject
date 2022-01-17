@@ -111,6 +111,8 @@ IGL_INLINE void Renderer::init(igl::opengl::glfw::Viewer* viewer,int coresNum, i
 		core().viewport = Eigen::Vector4f(0, 0, width/4, height);
 		left_view = core_list[0].id;
 		right_view = append_core(Eigen::Vector4f(width/4, 0, width*3/4, height));
+		// core(right_view).camera_translation = Eigen::Vector3f(0, -15, 0);
+		//core(left_view).camera_translation = Eigen::Vector3f(0, -15, 0);
 		core_index(right_view - 1);
 		for (size_t i = 0; i < scn->data_list.size(); i++)
 		{
@@ -372,3 +374,4 @@ IGL_INLINE void Renderer::resize(GLFWwindow* window,int w, int h)
 	//		}
 	//	}
 	//}
+

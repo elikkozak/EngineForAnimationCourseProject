@@ -362,7 +362,20 @@ namespace glfw
 
 	  return prevTrans;
   }
+  // IGL_INLINE void Viewer::Fabrik_Loop()
+  // {
+  //     double r_i = 0.0;
+  //     double lambda_i = 0;
+  // 	  new_joint.back() = T;
+  //     for (int i = new_joint.size() - 2; i >= 1; --i)
+  //     {
+  //         r_i = (new_joint[i + 1] - new_joint[i]).norm();
+  //         lambda_i = 1.6 / r_i;
+  //         new_joint[i] = (1 - lambda_i) * new_joint[i + 1] + lambda_i * new_joint[i];
+  //     }
+  // }
+} // end namespace
+} // end namespace
 
-} // end namespace
-} // end namespace
 }
+

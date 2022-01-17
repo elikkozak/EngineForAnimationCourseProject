@@ -104,6 +104,8 @@ public:
 	void TranslateCamera(Eigen::Vector3f amt);
 	void RotateCamera(float amtX, float amtY);
 	inline bool IsPicked() { return scn->isPicked; }
+
+
 	
 private:
 	// Stores all the viewing options

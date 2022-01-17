@@ -1,44 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-mkdir.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-mkdir.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-download.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-download.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-update.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-update.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-patch.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-patch.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-configure.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-configure.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-build.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-build.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-install.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-install.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\a52847fcf3552b5d1106c42f39cec573\glad-download-test.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\bfa941755bd8bc80198657982737621d\glad-download-test.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\1e95895e67ddacf60b58d4fb984559ac\glad-download-complete.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\1088342e9e342b0303a967948dbdff6f\glad-download-complete.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\472d8ab8952453840fd48fc1ec6f25eb\glad-download.rule">
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\8fef28c60a30639529f8ca2244d2cf07\glad-download.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
-    <CustomBuild Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Dev\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\glad-download" />
+    <None Include="C:\Users\elikk\Desktop\ASS4\EngineForAnimationCourse\external\.cache\glad\CMakeFiles\glad-download" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{FC344A91-0E34-351C-8666-BD1B1465372F}</UniqueIdentifier>
+      <UniqueIdentifier>{D28E3AC4-E7EB-329A-96A4-23940AFE4B3B}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -47,6 +47,103 @@ IGL_INLINE void igl::opengl::ViewerData::set_face_based(bool newvalue)
   }
 }
 
+IGL_INLINE void igl::opengl::ViewerData::addAndDrawJoints() {
+    Eigen::AlignedBox<double, 3> box = tree.m_box;
+    Eigen::RowVector3d v_0 = box.corner(box.BottomLeftFloor);  //vertices of box are like this
+    Eigen::RowVector3d v_4 = box.corner(box.BottomLeftCeil);//    | |     | |
+    Eigen::RowVector3d v = (v_0 - v_4);
+    std::cout << v <<   std::endl;
+
+    for (int i = -8; i <= 8; ++i)
+    {
+        joint_pos.push_back(Eigen::Vector3d(0, 0, i * 0.1));
+    }
+
+    Eigen::RowVector3d colorVecR;
+    Eigen::RowVector3d colorVecG;
+    Eigen::RowVector3d colorVecB;
+
+    point_size = 10;
+    line_width = 2;
+    colorVecR = Eigen::RowVector3d(255, 0, 0);
+    colorVecG = Eigen::RowVector3d(0, 255, 0);
+    colorVecB = Eigen::RowVector3d(0, 0, 255);
+
+    for (int i = 0; i < joint_pos.size(); ++i)
+    {
+
+        Eigen::RowVector3d center = joint_pos[i];
+        Eigen::RowVector3d center_x_1 = center + Eigen::RowVector3d(0.8, 0, 0);
+        Eigen::RowVector3d center_x_2 = center + Eigen::RowVector3d(-0.8, 0, 0);
+        Eigen::RowVector3d center_y_1 = center + Eigen::RowVector3d(0, 0.8, 0);
+        Eigen::RowVector3d center_y_2 = center + Eigen::RowVector3d(0, -0.8, 0);
+        Eigen::RowVector3d center_z_1 = center + Eigen::RowVector3d(0, 0, 0.08);
+        Eigen::RowVector3d center_z_2 = center + Eigen::RowVector3d(0, 0, -0.08);
+
+        add_edges(center_x_1, center_x_2, colorVecR);
+        add_edges(center_y_1, center_y_2, colorVecG);
+        add_edges(center_z_1, center_z_2, colorVecB);
+    }
+}
+
+
+void igl::opengl::ViewerData::drawBox(Eigen::AlignedBox<double, 3> box) {
+    point_size = 10;
+    line_width = 2;
+    Eigen::RowVector3d colorVec;
+
+    colorVec = Eigen::RowVector3d(100, 100, 100); 
+
+	Eigen::RowVector3d v_0 = box.corner(box.BottomLeftFloor);  //vertices of box are like this
+    Eigen::RowVector3d v_1 = box.corner(box.TopLeftFloor);//        v5-----v6 
+    Eigen::RowVector3d v_2 = box.corner(box.TopRightFloor);//      /|      /|  
+    Eigen::RowVector3d v_3 = box.corner(box.BottomRightFloor);//  v4------v7|
+    Eigen::RowVector3d v_4 = box.corner(box.BottomLeftCeil);//    | |     | |
+    Eigen::RowVector3d v_5 = box.corner(box.TopLeftCeil);//       |v1------v2 
+    Eigen::RowVector3d v_6 = box.corner(box.TopRightCeil); //     |/      |/  
+    Eigen::RowVector3d v_7 = box.corner(box.BottomRightCeil);//   v0------v3
+
+    add_edges(v_0, v_1, colorVec);
+    add_edges(v_0, v_3, colorVec);
+    add_edges(v_0, v_4, colorVec);
+
+    add_edges(v_1, v_2, colorVec);
+    add_edges(v_1, v_5, colorVec);
+
+    add_edges(v_2, v_3, colorVec);
+    add_edges(v_2, v_6, colorVec);
+
+    add_edges(v_3, v_7, colorVec);
+
+    add_edges(v_4, v_5, colorVec);
+    add_edges(v_4, v_7, colorVec);
+
+    add_edges(v_5, v_6, colorVec);
+
+    add_edges(v_6, v_7, colorVec);
+
+    Eigen::RowVector3d colorVecR;
+    Eigen::RowVector3d colorVecG;
+    Eigen::RowVector3d colorVecB;
+
+    colorVecR = Eigen::RowVector3d(255, 0, 0);
+    colorVecG = Eigen::RowVector3d(0, 255, 0);
+    colorVecB = Eigen::RowVector3d(0, 0, 255);
+
+    // Eigen::RowVector3d center = box.center();
+    // Eigen::RowVector3d center_x_1 = center + Eigen::RowVector3d(0.8, 0, 0);
+    // Eigen::RowVector3d center_x_2 = center + Eigen::RowVector3d(-0.8, 0, 0);
+    // Eigen::RowVector3d center_y_1 = center + Eigen::RowVector3d(0, 0.8, 0);
+    // Eigen::RowVector3d center_y_2 = center + Eigen::RowVector3d(0, -0.8, 0);
+    // Eigen::RowVector3d center_z_1 = center + Eigen::RowVector3d(0, 0, 0.8);
+    // Eigen::RowVector3d center_z_2 = center + Eigen::RowVector3d(0, 0, -0.8);
+    //
+    // add_edges(center_x_1, center_x_2, colorVecR);
+    // add_edges(center_y_1, center_y_2, colorVecG);
+    // add_edges(center_z_1, center_z_2, colorVecB);
+}
+
+
 // Helpers that draws the most common meshes
 IGL_INLINE void igl::opengl::ViewerData::set_mesh(
     const Eigen::MatrixXd& _V, const Eigen::MatrixXi& _F)
@@ -74,7 +171,7 @@ IGL_INLINE void igl::opengl::ViewerData::set_mesh(
       Eigen::Vector3d(GOLD_AMBIENT[0], GOLD_AMBIENT[1], GOLD_AMBIENT[2]),
       Eigen::Vector3d(GOLD_DIFFUSE[0], GOLD_DIFFUSE[1], GOLD_DIFFUSE[2]),
       Eigen::Vector3d(GOLD_SPECULAR[0], GOLD_SPECULAR[1], GOLD_SPECULAR[2]));
-	image_texture("C:/Dev/EngineForAnimationCourse/tutorial/textures/snake1.png");
+	image_texture("C:/Users/elikk/Desktop/ASS2/EngineForAnimationCourse/tutorial/textures/snake1.png");
 //    grid_texture();
   }
   else

@@ -397,21 +397,21 @@ IGL_INLINE igl::opengl::ViewerCore::ViewerCore()
 
   // Camera parameters
   camera_base_zoom = 1.0f;
-  camera_zoom = 1.0f;
+  camera_zoom = 5.0f;
   orthographic = false;
   camera_view_angle = 45.0;
   camera_dnear = 1.0;
   camera_dfar = 100.0;
   camera_base_translation << 0, 0, 0;
   camera_translation << 0, 0, 0;
-  camera_eye << 0, -90, 5;
+  camera_eye << 0, 20, 5;
   camera_center << 0, 0, 0;
-  camera_up << 0, 1, 0;
+  camera_up << 0, -1, 0;
 
   depth_test = true;
 
   is_animating = false;
-  animation_max_fps = 30.;
+  animation_max_fps = 60.;
 
   viewport.setZero();
 }

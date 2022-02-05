@@ -53,9 +53,8 @@ public:
   IGL_INLINE void set_face_based(bool newvalue);
 
   void drawBox(Eigen::AlignedBox<double, 3> box);
-  std::vector<Eigen::Vector3d> joint_pos;
 
-  void addAndDrawJoints();
+  void addAndDrawJoints(std::vector<Eigen::Vector3d> joint_pos);
 
   // Helpers that can draw the most common meshes
   IGL_INLINE void set_mesh(const Eigen::MatrixXd& V, const Eigen::MatrixXi& F);

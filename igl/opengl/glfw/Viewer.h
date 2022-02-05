@@ -16,6 +16,7 @@
 #include "../MeshGL.h"
 
 #include "../ViewerData.h"
+
 #include "ViewerPlugin.h"
 
 
@@ -25,6 +26,7 @@
 #include <vector>
 #include <string>
 #include <cstdint>
+#include <Build\tutorial\sandBox\Joint.h>
 
 #define IGL_MOD_SHIFT           0x0001
 #define IGL_MOD_CONTROL         0x0002
@@ -87,6 +89,9 @@ namespace glfw
     IGL_INLINE ViewerData& data(int mesh_id = -1);
     IGL_INLINE const ViewerData& data(int mesh_id = -1) const;
 
+    IGL_INLINE Joint& Viewer::joint();
+
+
     // Append a new "slot" for a mesh (i.e., create empty entries at the end of
     // the data_list and opengl_state_list.
     //
@@ -98,6 +103,7 @@ namespace glfw
     //   selected_data_index is set this newly created, last entry (i.e.,
     //   #meshes-1)
     IGL_INLINE int append_mesh(bool visible = true);
+    IGL_INLINE void append_joint();
 
     // Erase a mesh (i.e., its corresponding data and state entires in data_list
     // and opengl_state_list)
@@ -136,6 +142,7 @@ public:
 
 
     std::vector<ViewerData> data_list;
+    std::vector<Joint> joint_list;
 	
 	std::vector<int> parents;
 

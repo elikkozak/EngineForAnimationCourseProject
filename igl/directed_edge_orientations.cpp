@@ -19,7 +19,7 @@ IGL_INLINE void igl::directed_edge_orientations(
   for(int e = 0;e<E.rows();e++)
   {
     const auto & b = C.row(E(e,1)) - C.row(E(e,0));
-    Q[e].setFromTwoVectors( RowVector3d(1,0,0),b);
+    Q[e].setFromTwoVectors( RowVector3d(0,0,1),b);
   }
 }
 

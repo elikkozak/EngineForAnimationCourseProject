@@ -62,28 +62,28 @@ namespace glfw
 
   }
 
-  IGL_INLINE Viewer::Viewer():
-    data_list(1),
-    selected_data_index(0),
-    next_data_id(1),
-	isPicked(false),
-	isActive(false)
+  IGL_INLINE Viewer::Viewer() :
+      data_list(1),
+      selected_data_index(0),
+      next_data_id(1),
+      isPicked(false),
+      isActive(false)
   {
-    data_list.front().id = 0;
+      data_list.front().id = 0;
 
-  
 
-    // Temporary variables initialization
-   // down = false;
-  //  hack_never_moved = true;
-    scroll_position = 0.0f;
 
-    // Per face
-    data().set_face_based(false);
+      // Temporary variables initialization
+     // down = false;
+    //  hack_never_moved = true;
+      scroll_position = 0.0f;
 
-    
+      // Per face
+      data().set_face_based(false);
+
+
 #ifndef IGL_VIEWER_VIEWER_QUIET
-    const std::string usage(R"(igl::opengl::glfw::Viewer usage:
+      const std::string usage(R"(igl::opengl::glfw::Viewer usage:
   [drag]  Rotate scene
   A,a     Toggle animation (tight draw loop)
   F,f     Toggle face based
@@ -95,8 +95,8 @@ namespace glfw
   1,2     Toggle between models
   ;       Toggle vertex labels
   :       Toggle face labels)"
-);
-    std::cout<<usage<<std::endl;
+      );
+      std::cout << usage << std::endl;
 #endif
   }
 
@@ -293,6 +293,11 @@ namespace glfw
     return data_list[index];
   }
 
+  IGL_INLINE Joint& Viewer::joint()
+  {
+      return joint_list[0];
+  }
+
   IGL_INLINE const ViewerData& Viewer::data(int mesh_id /*= -1*/) const
   {
     assert(!data_list.empty() && "data_list should never be empty");
@@ -320,6 +325,13 @@ namespace glfw
     //else
     //    data_list.back().is_visible = 0;
     return data_list.back().id;
+  }
+
+  IGL_INLINE void Viewer::append_joint()
+    {
+     
+      joint_list.emplace_back();
+     
   }
 
   IGL_INLINE bool Viewer::erase_mesh(const size_t index)

@@ -47,17 +47,14 @@ IGL_INLINE void igl::opengl::ViewerData::set_face_based(bool newvalue)
   }
 }
 
-IGL_INLINE void igl::opengl::ViewerData::addAndDrawJoints() {
+IGL_INLINE void igl::opengl::ViewerData::addAndDrawJoints(std::vector<Eigen::Vector3d> joint_pos) {
     Eigen::AlignedBox<double, 3> box = tree.m_box;
     Eigen::RowVector3d v_0 = box.corner(box.BottomLeftFloor);  //vertices of box are like this
     Eigen::RowVector3d v_4 = box.corner(box.BottomLeftCeil);//    | |     | |
     Eigen::RowVector3d v = (v_0 - v_4);
-    std::cout << v <<   std::endl;
+    std::cout<<"V: " << v.norm() <<   std::endl;
 
-    for (int i = -8; i <= 8; ++i)
-    {
-        joint_pos.push_back(Eigen::Vector3d(0, 0, i * 0.1));
-    }
+    
 
     Eigen::RowVector3d colorVecR;
     Eigen::RowVector3d colorVecG;
@@ -72,7 +69,7 @@ IGL_INLINE void igl::opengl::ViewerData::addAndDrawJoints() {
     for (int i = 0; i < joint_pos.size(); ++i)
     {
 
-        Eigen::RowVector3d center = joint_pos[i];
+        Eigen::RowVector3d center = joint_pos[i] - Eigen::Vector3d(0, 0, 0.8);  //vertices of box are like this
         Eigen::RowVector3d center_x_1 = center + Eigen::RowVector3d(0.8, 0, 0);
         Eigen::RowVector3d center_x_2 = center + Eigen::RowVector3d(-0.8, 0, 0);
         Eigen::RowVector3d center_y_1 = center + Eigen::RowVector3d(0, 0.8, 0);

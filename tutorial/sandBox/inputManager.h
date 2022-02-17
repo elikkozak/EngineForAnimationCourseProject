@@ -111,51 +111,52 @@ static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int act
 		case 'A':
 		case 'a':
 		{
-			rndr->core().is_animating = !rndr->core().is_animating;
+			//rndr->core().is_animating = !rndr->core().is_animating;
 			break;
 		}
 		case 'F':
 		case 'f':
 		{
-			scn->data().set_face_based(!scn->data().face_based);
+			//scn->data().set_face_based(!scn->data().face_based);
+			scn->isCameraUp = !scn->isCameraUp;
 			break;
 		}
 		case 'I':
 		case 'i':
 		{
-			scn->data().dirty |= igl::opengl::MeshGL::DIRTY_NORMAL;
-			scn->data().invert_normals = !scn->data().invert_normals;
+			//scn->data().dirty |= igl::opengl::MeshGL::DIRTY_NORMAL;
+			//scn->data().invert_normals = !scn->data().invert_normals;
 			break;
 		}
 		case 'L':
 		case 'l':
 		{
-			rndr->core().toggle(scn->data().show_lines);
+			//rndr->core().toggle(scn->data().show_lines);
 			break;
 		}
 		case 'O':
 		case 'o':
 		{
-			rndr->core().orthographic = !rndr->core().orthographic;
+			//rndr->core().orthographic = !rndr->core().orthographic;
 			break;
 		}
 		case 'T':
 		case 't':
 		{
-			rndr->core().toggle(scn->data().show_faces);
+			//rndr->core().toggle(scn->data().show_faces);
 			break;
 		}
 		case '[':
 		case ']':
 		{
-			rndr->ChangeCamera(key);
+			//rndr->ChangeCamera(key);
 			break;
 		}
 		case ';':
-			scn->data().show_vertid = !scn->data().show_vertid;
+			//scn->data().show_vertid = !scn->data().show_vertid;
 			break;
 		case ':':
-			scn->data().show_faceid = !scn->data().show_faceid;
+			//scn->data().show_faceid = !scn->data().show_faceid;
 			break;
 		case 'w':
 		case 'W':
@@ -163,11 +164,11 @@ static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int act
 			break;
 		case 's':
 		case 'S':
-			rndr->TranslateCamera(Eigen::Vector3f(0, 0, -0.03f));
+			//rndr->TranslateCamera(Eigen::Vector3f(0, 0, -0.03f));
 			break;
 		case GLFW_KEY_C:
-			tmp = (scn->data().MakeTransScaled().inverse() * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
-			scn->data().SetCenterOfRotation(tmp);
+			//tmp = (scn->data().MakeTransScaled().inverse() * Eigen::Vector4d(0, 0, 0, 1)).head<3>();
+			//scn->data().SetCenterOfRotation(tmp);
 			break;
 		case GLFW_KEY_UP:
 			//rndr->TranslateCamera(Eigen::Vector3f(0, 0.01f,0));
@@ -190,7 +191,29 @@ static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int act
 			break;
 		case ' ':
 			scn->SetAnimation();
+			break;
 
+		case 'P':
+		case 'p':
+			if (scn->isStart)
+			{
+				scn->setStart();
+				scn->setPause();
+			}
+			break;
+
+		case 'M':
+		case 'm':
+			if (scn->isMusicPlaying)
+			{
+				scn->PauseMusic();
+				scn->isMusicPlaying = !scn->isMusicPlaying;
+			}
+			else
+			{
+				scn->ResumeMusic();
+				scn->isMusicPlaying = !scn->isMusicPlaying;
+			}
 			break;
 		
 		default: 
@@ -217,6 +240,7 @@ void Init(Display& display, igl::opengl::glfw::imgui::ImGuiMenu *menu)
 	display.AddMouseCallBacks(glfw_mouse_press, glfw_mouse_scroll, glfw_mouse_move);
 	display.AddResizeCallBack(glfw_window_size);
 	menu->init(&display);
+
 }
 
 

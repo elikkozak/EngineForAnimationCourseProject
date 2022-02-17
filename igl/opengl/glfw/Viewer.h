@@ -16,6 +16,7 @@
 #include "../MeshGL.h"
 
 #include "../ViewerData.h"
+#include "../ViewerCore.h"
 
 #include "ViewerPlugin.h"
 
@@ -49,7 +50,7 @@ namespace glfw
    // enum class MouseButton {Left, Middle, Right};
    // enum class MouseMode { None, Rotation, Zoom, Pan, Translation} mouse_mode;
     virtual void Init(const std::string config);
-	virtual void Animate() {}
+	virtual void Animate(igl::opengl::ViewerCore &core) {}
 	virtual void WhenTranslate() {}
 	virtual Eigen::Vector3d GetCameraPosition() { return Eigen::Vector3d(0, 0, 0); }
 	virtual Eigen::Vector3d GetCameraForward() { return Eigen::Vector3d(0, 0, -1); }
@@ -152,6 +153,25 @@ public:
 	bool isActive;
     bool isMoving = false;
     Eigen::Vector3d dir = Eigen::Vector3d(0.005, 0, 0);
+
+    bool isCameraUp = true;
+    bool isStart = false;
+    void setStart() { isStart = !isStart; }
+    int score = 0;
+
+    bool isInstructions = false;
+    void setInstructions() { isInstructions = !isInstructions; }
+    bool isMainMenu = true;
+    void setMainMenu() { isMainMenu = !isMainMenu; }
+    bool isCredits = false;
+    void setCredits() { isCredits = !isCredits; }
+    bool isPause = false;
+    void setPause() { isPause = !isPause; }
+
+    bool isMusicPlaying = true;
+
+
+    bool shouldClose = false;
 
 
     

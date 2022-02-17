@@ -13,6 +13,7 @@ public:
 	~SandBox();
 	bool check_collision_rec(igl::AABB<Eigen::MatrixXd, 3>* node1, igl::AABB<Eigen::MatrixXd, 3>* node2, Eigen::Matrix3d& R_mat, Eigen::Matrix4d& A_trans, Eigen::Matrix4d& B_trans, Eigen::Matrix3d& A_rot, Eigen::Matrix3d& B_rot);
 	void check_collision();
+	void new_check_collision(int i, Eigen::Vector3d head_loc);
 	void Init(const std::string& config);
 	void init_skinning_stuff();
 	void scale_snake();
@@ -54,13 +55,23 @@ public:
 
 	std::vector<RotationList > poses; // rotations of joints for animation
 	std::vector<Eigen::Vector3d> new_pos;
-	double anim_t = 0.0;
+	double anim_t = 0;
 	double anim_t_dir = 0.2;
-	
+	Eigen::Vector4d our_vec;
+	Eigen::Vector3d move_dir;
+	Eigen::Vector3d head_loc;
+	void move_balls();
+	int border = 0;
+	int sign = 1;
+
+	Eigen::Quaterniond rot_quaternion = Eigen::Quaterniond::Identity();
+
+	void PauseMusic();
+	void ResumeMusic();
 private:
 	// Prepare array-based edge data structures and priority queue
 	
 	
-	void Animate();
+	void Animate(igl::opengl::ViewerCore &core);
 };
 

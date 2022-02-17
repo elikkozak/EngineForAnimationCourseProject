@@ -135,7 +135,7 @@ IGL_INLINE void igl::opengl::ViewerCore::draw(
 
     float width  = viewport(2);
     float height = viewport(3);
-
+    //std::cout << "CAMERA EYE: " <<camera_eye.transpose() << std::endl;
     // Set view
     look_at( camera_eye, camera_center, camera_up, view);
     view = view
@@ -405,13 +405,13 @@ IGL_INLINE igl::opengl::ViewerCore::ViewerCore()
   camera_base_translation << 0, 0, 0;
   camera_translation << 0, 0, 0;
   camera_eye << 0, 20, 5;
-  camera_center << 0, 0, 0;
+  camera_center << 0,0,0;
   camera_up << 0, -1, 0;
 
   depth_test = true;
 
   is_animating = false;
-  animation_max_fps = 60.;
+  animation_max_fps = 240.;
 
   viewport.setZero();
 }

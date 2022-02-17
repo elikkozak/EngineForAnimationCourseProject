@@ -123,7 +123,7 @@ bool Display::launch_rendering(bool loop)
 	{
 
 		double tic = igl::get_seconds();
-		renderer->Animate();
+		renderer->Animate(renderer->core(0));
 		renderer->draw(window);
 		glfwSwapBuffers(window);
 		if (renderer->core().is_animating || frame_counter++ < num_extra_frames)
@@ -144,7 +144,10 @@ bool Display::launch_rendering(bool loop)
 		}
 		if (!loop)
 			return !glfwWindowShouldClose(window);
-
+		if (renderer->GetScene()->shouldClose)
+		{
+			glfwSetWindowShouldClose(window, 1);
+		}
 #ifdef __APPLE__
 		static bool first_time_hack = true;
 		if (first_time_hack) {

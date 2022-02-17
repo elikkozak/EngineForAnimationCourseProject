@@ -11,6 +11,13 @@
 #include <igl/lbs_matrix.h>
 #include <igl/PI.h>
 
+#include <windows.h>
+#include <Mmsystem.h>
+#include <mciapi.h>
+
+#pragma comment(lib, "Winmm.lib")
+
+
 
 SandBox::SandBox()
 {
@@ -19,12 +26,9 @@ SandBox::SandBox()
 }
 Eigen::MatrixXd SandBox:: calcWeights()
 {
-	std::cout << "CALC\n";
 
 	int num_of_verticies = data().V.rows();
-	std::cout << num_of_verticies << std::endl;
 	Eigen::MatrixXd W = Eigen::MatrixXd(num_of_verticies, 16);
-	std::cout << "CALC1\n";
 
 	for (int i = 0; i < W.rows(); ++i)
 	{
@@ -46,8 +50,6 @@ Eigen::MatrixXd SandBox:: calcWeights()
 
 		double loc_floor = floor(loc);
 
-		//std::cout << "loc: " << loc << std::endl;
-		//std::cout << "loc floor: " << loc_floor<< std::endl;
 		if(loc == 0){
 			W(i, 0) = 1;
 		}
@@ -115,7 +117,6 @@ Eigen::MatrixXd SandBox:: calcWeights()
 			}
 		}
 	}
-	std::cout << "CALC2\n";
 
 	return W;
 }
@@ -124,12 +125,13 @@ void SandBox::pre_draw()
 
 	// Interpolate pose and identity
 	 RotationList anim_pose(curr_pose.size());
-	 //std::cout << "anim_t : " << anim_t << std::endl;
-	 
+
+	
 	for (int e = 0; e < curr_pose.size(); e++)
 	{
 		anim_pose[e] = rest_pose[e].slerp(anim_t, curr_pose[e]);
 	}
+	rot_quaternion = anim_pose[0] ;
 	// Propagate relative rotations via FK to retrieve absolute transformations
 	// vQ - rotations of joints
 	// vT - translation of joints
@@ -163,7 +165,12 @@ void SandBox::pre_draw()
 	data().set_points(CT, skeleton_joint_color);
 	data().set_edges(CT, BET, skeleton_bone_color);
 	data().compute_normals();
-		
+
+	
+	our_vec<< CT(0, 0), CT(0, 1), CT(0, 2), 1;
+	our_vec = data().MakeTransd() * our_vec;
+	head_loc = our_vec.head<3>();
+	
 	anim_t += anim_t_dir;
 		
 	
@@ -202,7 +209,6 @@ bool SandBox::check_collision_cond(Eigen::AlignedBox<double, 3> box_1, Eigen::Al
 	Eigen::RowVector3d T = P_B - P_A;
 	//Eigen::Matrix3d R_mat = A * B;
 
-	//std::cout << T << std::endl;
 
 	//CASE 1:
 	R_0 = W_A;
@@ -388,6 +394,19 @@ void SandBox::check_collision()
 	}
 }
 
+void SandBox::new_check_collision(int i, Eigen::Vector3d head_loc)
+{
+	Eigen::Vector4d ball_loc_vec4= data_list[i].MakeTransd() * Eigen::Vector4d::UnitW();
+	Eigen::Vector3d ball_loc_vec3 = ball_loc_vec4.head<3>();
+	if((head_loc-ball_loc_vec3).norm()<1)
+	{
+		
+		std::cout << "HIT\n";
+		data(i).MyTranslate(Eigen::Vector3d(0,0,5),true) ;
+		//data_list[i].set_face
+	}
+}
+
 void SandBox::Init(const std::string &config)
 {
 	std::string item_name;
@@ -420,7 +439,7 @@ void SandBox::Init(const std::string &config)
 		nameFileout.close();
 	}
 	append_joint();
-	MyTranslate(Eigen::Vector3d(0, 0, -1), true);
+	//MyTranslate(Eigen::Vector3d(0, 0, -1), true);
 	
 	
 	init_skinning_stuff();
@@ -432,10 +451,13 @@ void SandBox::Init(const std::string &config)
 	igl::AABB<Eigen::MatrixXd, 3> tree = data().tree;
 	Eigen::AlignedBox<double, 3> box = tree.m_box;
 	data().drawBox(box);
-	data(0).MyTranslate(Eigen::Vector3d(0, 0, -19), true);
+	data(0).MyTranslate(Eigen::Vector3d(0, 0, -20), true);
+	data(1).MyTranslate(Eigen::Vector3d(10, 0, -20), true);
 	data().set_colors(Eigen::RowVector3d(0.9, 0.1, 0.1));
 	//data().MyScale(Eigen::Vector3d(1, 1, 16));
-
+	
+	mciSendString("open \"C:\\Users\\elikk\\Desktop\\TRY\\EngineForAnimationCourse\\tutorial\\data\\musicforgame.wav\" type mpegvideo alias wav", NULL, 0, NULL);
+	//mciSendString("play wav", NULL, 0, NULL);
 }
 
 void SandBox::init_skinning_stuff()
@@ -463,10 +485,7 @@ void SandBox::init_skinning_stuff()
 	igl::directed_edge_parents(BE, P);
 	igl::directed_edge_orientations(C, BE, rest_pose);
 
-	for (int i = 0; i < rest_pose.size(); ++i)
-	{
-		std::cout << rest_pose[i].matrix() << std::endl;
-	}
+	
 	
 
 	curr_pose = rest_pose;
@@ -520,33 +539,25 @@ void SandBox::update_next_pose()
 	case up:
 		axis << 1, 0, 0;
 		angle = igl::PI / 10;
-		xangle += angle;
 		break;
 	case down:
 		axis << 1, 0, 0;
 		angle = -igl::PI / 10;
-		xangle += angle;
 		break;
 	case right:
 		axis << 0, 1, 0;
 		angle = igl::PI / 10;
-		yangle += angle;
 		break;
 	case left:
 		axis << 0, 1, 0;
 		angle = -igl::PI / 10;
-		yangle += angle;
 		break;
 	case NONE:
 		return;
 	}
 	
-	// std::cout << "next_pose mat: \n" << next_pose[0].toRotationMatrix().matrix() << std::endl;
 
-	Eigen::Quaterniond turn_x(Eigen::AngleAxisd(xangle, Eigen::Vector3d::UnitX()));
 
-	Eigen::Quaterniond turn_y(Eigen::AngleAxisd(yangle, Eigen::Vector3d::UnitY()));
-	//std::cout << "turn          " <<turn.matrix() << std::endl;
 	Eigen::Quaterniond turn1(Eigen::AngleAxisd(angle, curr_pose[0].toRotationMatrix().transpose()*axis));
 	Eigen::Quaterniond turn2(Eigen::AngleAxisd(-angle, curr_pose[0].toRotationMatrix().transpose()*axis));
 	next_pose[0] = curr_pose[0]*turn1;
@@ -559,25 +570,86 @@ SandBox::~SandBox()
 
 }
 
-void SandBox::Animate()
+void SandBox::move_balls()
 {
+	if (border == 40  || border == -40)
+	{
+		sign *= -1;
+		
+	}
+	for (int i = 0; i < data_list.size()-1; ++i)
+	{
+		if(i%2==0)
+		{
+			move_dir = Eigen::Vector3d::UnitY();
+		}
+		else
+		{
+			move_dir = Eigen::Vector3d::UnitX();
+
+		}
+		data_list[i].MyTranslate(move_dir * ( sign * 0.10), true);
+	}
+	border += sign;
+}
+
+void SandBox::PauseMusic()
+{
+	mciSendString("pause wav", NULL, 0, NULL);
+
+}
+
+void SandBox::ResumeMusic()
+{
+	mciSendString("resume wav", NULL, 0, NULL);
+
+}
+
+void SandBox::Animate(igl::opengl::ViewerCore &core)
+{
+	
+
 	if (isActive)
 	{
-		//check_collision();
+		if(isCameraUp)
+		{
+			core.camera_eye = Eigen::Vector3f(0, 20, 5);
+			core.camera_zoom = 5.f;
+			core.camera_translation = Eigen::Vector3f::Zero();
+			core.camera_up = Eigen::Vector3f(0, -1, 0);
+		}
+		else
+		{
+			Eigen::Matrix4d transMat = data().MakeTransd();
+			core.camera_eye = (rot_quaternion.toRotationMatrix()  *Eigen::Vector3d(0, 0, 0.8)).block(0, 0, 3, 1).cast<float>();
+			//core.camera_eye = Eigen::Vector3d(0, 0, 0);
+			core.camera_up = (rot_quaternion.toRotationMatrix() * Eigen::Vector3d(0, 1, 0)).block(0, 0, 3, 1).cast<float>();
+			//core.camera_center = *Eigen::Vector3d(0, 0, -1);
+			core.camera_translation = ((transMat * Eigen::Vector4d(0, 0, 13.5, -1)).block(0,0,3,1)).block(0, 0, 3, 1).cast<float>();
+			//core.camera_translation = ((rot_quaternion.toRotationMatrix() * Eigen::Vector3d(0, 0, 13.8)).block(0, 0, 3, 1)).cast<float>();
+			core.camera_zoom = 1.f;
+		}
+		
+
+		//move_balls();
+		for (int i = 0; i < data_list.size()-1; ++i)
+		{
+			new_check_collision(i, head_loc);
+
+		}
 		pre_draw();
-		data().MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.2, true);
+		data().MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.25, true);
 
 		
 		if (anim_t > 1)
 		{
 			update_next_pose();
 			_dir = NONE;
-			anim_t = 0;
+			anim_t = anim_t_dir;
 			rest_pose = curr_pose;
 			curr_pose = next_pose;
 			for (int i = next_pose.size() - 1; i > 1; --i)
 			{
-				// std::cout <<"next pose: \n" <<next_pose[i].matrix()<<std::endl;
 				next_pose[i] = curr_pose[i - 1];
 			}
 
@@ -588,8 +660,10 @@ void SandBox::Animate()
 			}
 			
 		}
+		
 
 	}
+	
 }
 
 

@@ -131,7 +131,7 @@ static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int act
 		case 'L':
 		case 'l':
 		{
-			//rndr->core().toggle(scn->data().show_lines);
+			rndr->core().toggle(scn->data().show_overlay);
 			break;
 		}
 		case 'O':
@@ -160,7 +160,7 @@ static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int act
 			break;
 		case 'w':
 		case 'W':
-			rndr->TranslateCamera(Eigen::Vector3f(0, 0, 0.03f));
+			//scn->data(3).MyRotate(scn->rot_quaternion.toRotationMatrix().transpose());
 			break;
 		case 's':
 		case 'S':
@@ -197,6 +197,8 @@ static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int act
 		case 'p':
 			if (scn->isStart)
 			{
+				scn->SetAnimation();
+
 				scn->setStart();
 				scn->setPause();
 			}

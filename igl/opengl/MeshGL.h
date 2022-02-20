@@ -50,6 +50,45 @@ public:
   GLuint shader_overlay_lines;
   GLuint shader_overlay_points;
 
+  GLuint SkyBoxVBO;
+  GLuint cubemap;
+  GLuint textureID;
+  unsigned int skyboxVAO, skyboxVBO, skyboxEBO;
+  float skyboxVertices[24] =
+  {
+	  //   Coordinates
+	  -1.0f, -1.0f,  1.0f,//        7--------6
+	   1.0f, -1.0f,  1.0f,//       /|       /|
+	   1.0f, -1.0f, -1.0f,//      4--------5 |
+	  -1.0f, -1.0f, -1.0f,//      | |      | |
+	  -1.0f,  1.0f,  1.0f,//      | 3------|-2
+	   1.0f,  1.0f,  1.0f,//      |/       |/
+	   1.0f,  1.0f, -1.0f,//      0--------1
+	  -1.0f,  1.0f, -1.0f
+  };
+
+  unsigned int skyboxIndices[36] =
+  {
+	  // Right
+	  1, 2, 6,
+	  6, 5, 1,
+	  // Left
+	  0, 4, 7,
+	  7, 3, 0,
+	  // Top
+	  4, 5, 6,
+	  6, 7, 4,
+	  // Bottom
+	  0, 3, 2,
+	  2, 1, 0,
+	  // Back
+	  0, 1, 5,
+	  5, 4, 0,
+	  // Front
+	  3, 7, 6,
+	  6, 2, 3
+  };
+
   GLuint vbo_V; // Vertices of the current mesh (#V x 3)
   GLuint vbo_V_uv; // UV coordinates for the current mesh (#V x 2)
   GLuint vbo_V_normals; // Vertices of the current mesh (#V x 3)
@@ -103,6 +142,8 @@ public:
   // Bind the underlying OpenGL buffer objects for subsequent mesh draw calls
   IGL_INLINE void bind_mesh();
 
+  IGL_INLINE void bind_cubemap();
+
   /// Draw the currently buffered mesh (either solid or wireframe)
   IGL_INLINE void draw_mesh(bool solid);
 
@@ -117,6 +158,8 @@ public:
 
   /// Draw the currently buffered point overlay
   IGL_INLINE void draw_overlay_points();
+
+  IGL_INLINE void draw_cubemap();
 
   // Release the OpenGL buffer objects
   IGL_INLINE void free_buffers();

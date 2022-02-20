@@ -68,6 +68,11 @@ public:
 
 	void PauseMusic();
 	void ResumeMusic();
+
+	int snake_pos;
+	void betweenLevelsOrganize();
+	void organizeLevel();
+
 private:
 	// Prepare array-based edge data structures and priority queue
 	

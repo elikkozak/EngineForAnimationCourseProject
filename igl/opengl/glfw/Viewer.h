@@ -29,6 +29,8 @@
 #include <cstdint>
 #include <Build\tutorial\sandBox\Joint.h>
 
+using namespace std;
+
 #define IGL_MOD_SHIFT           0x0001
 #define IGL_MOD_CONTROL         0x0002
 #define IGL_MOD_ALT             0x0004
@@ -168,11 +170,59 @@ public:
     bool isPause = false;
     void setPause() { isPause = !isPause; }
 
+    bool isHighScore = false;
+    void setHighScore() { isHighScore = !isHighScore; }
+
+    bool isBetweenLevels = false;
+    void setBetweenLevels() { isBetweenLevels = !isBetweenLevels; }
+
     bool isMusicPlaying = true;
 
+    bool isSecondLevel = false;
+    void setSecondLevel() { isSecondLevel = !isSecondLevel; }
 
     bool shouldClose = false;
 
+    string playerName = "NULL";
+
+    void insertScore(string name, int score) {
+        string path = "highscore.txt";
+        fstream createFileIfNotExist(path, ios::out | ios::in | ios::app);
+        createFileIfNotExist.close();
+        fstream highScoreFileRead(path, ios::out | ios::in);
+        vector<pair<int, string> > score_vector;
+        int currScore;
+        string currName;
+        if (highScoreFileRead.is_open()) {
+            while (highScoreFileRead >> currName >> currScore) {
+                score_vector.push_back(make_pair(currScore, currName));
+            }
+            highScoreFileRead.close();
+            score_vector.push_back(make_pair(score, name));
+            sort(score_vector.begin(), score_vector.end());
+            reverse(score_vector.begin(), score_vector.end());
+        }
+        else {
+            cout << "Could Not Open The File For Reading" << endl;
+        }
+        fstream highScoreFilewrite(path, ios::out | ios::in | ios::trunc);
+        if (highScoreFilewrite.is_open()) {
+            string allHighScores;
+            for (auto it = score_vector.begin(); it != score_vector.end(); ++it) {
+                allHighScores = allHighScores + it->second + " " + to_string(it->first) + '\n';
+            }
+            highScoreFilewrite.clear();
+            highScoreFilewrite << allHighScores;
+            highScoreFilewrite.close();
+        }
+        else {
+            cout << "Could Not Open The File For Writing" << endl;
+        }
+
+    }
+    
+
+    
 
     
 

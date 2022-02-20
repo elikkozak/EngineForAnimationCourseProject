@@ -73,6 +73,7 @@ public:
   //
   // data cannot be const because it is being set to "clean"
   IGL_INLINE void draw(const Eigen::Matrix4f &worldMat, ViewerData& data, bool update_matrices = true);
+  IGL_INLINE void drawCubeMap(const Eigen::Matrix4f& worldMat, ViewerData& data, bool update_matrices = true);
   IGL_INLINE void UpdateUniforms(Eigen::Matrix4f &worldMat, ViewerData& data, bool update_matrices = true);
 
   IGL_INLINE void draw_buffer(

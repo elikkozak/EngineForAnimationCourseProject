@@ -19,6 +19,8 @@
 //#include <imgui_fonts_droid_sans.h>
 //#include <GLFW/glfw3.h>
 #include <iostream>
+
+using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 
 namespace igl
@@ -212,17 +214,30 @@ namespace igl
                     if (viewer->isMainMenu) {
 	                    for (int i = 0; i < viewer->data_list.size(); ++i)
 	                    {
+                            //core[0].set(viewer->data(i).show_faces, false);
                             core[1].set(viewer->data(i).show_faces, false);
 
+
 	                    }
-                        ImGui::SetWindowFontScale(1.5f);
-
+                        ImGui::SetWindowFontScale(2.5f);
+                        
                         ImGui::SameLine(core[0].viewport[2] / 2 - 200);
-
+                        ImGui::SetCursorPosY(150);
+                        static char str1[20] = "";
+                        ImGui::Text("Name:");
+                        ImGui::SameLine();
+                        ImGui::PushItemWidth(300);
+                        ImGui::InputTextWithHint("", "enter name here", str1, IM_ARRAYSIZE(str1));
+                        viewer->playerName = str1;
+                        ImGui::SetWindowFontScale(1.5f);
+                        ImGui::SameLine(core[0].viewport[2] / 2 - 200);
                         ImGui::SetCursorPosY(260);
                         if (ImGui::Button("Start", ImVec2(400, 45)))
                         {
+                            if (viewer->playerName.compare("") == 0)
+                                viewer->playerName = "NULL";
                             viewer->setMainMenu();
+                            viewer->SetAnimation();
 
                             viewer->setStart();
                         }
@@ -239,7 +254,11 @@ namespace igl
                         ImGui::SameLine(core[0].viewport[2] / 2 - 200);
                         if (ImGui::Button("High Score", ImVec2(400, 45)))
                         {
+                            viewer->setMainMenu();
+                            viewer->setHighScore();
+
                         }
+                        
 
                         ImGui::NewLine();
 
@@ -277,6 +296,14 @@ namespace igl
 
                         ImGui::SameLine(core[0].viewport[2] / 2 - 200);
                         ImGui::Text("Use arrow keys to move.", ImVec2(400, 0));
+                        ImGui::NewLine();
+
+                        ImGui::SameLine(core[0].viewport[2] / 2 - 200);
+                        ImGui::Text("Collect the balls to increase your score.", ImVec2(400, 0));
+                        ImGui::NewLine();
+
+                        ImGui::SameLine(core[0].viewport[2] / 2 - 200);
+                        ImGui::Text("Do not touch the boxes.", ImVec2(400, 0));
                         ImGui::NewLine();
 
 
@@ -336,7 +363,11 @@ namespace igl
                     }
                     else if (viewer->isPause)
                     {
-                        core[1].set(viewer->data().show_faces, false);
+                    for (int i = 0; i < viewer->data_list.size(); ++i)
+                    {
+                        core[1].set(viewer->data(i).show_faces, false);
+
+                    }
 
                         ImGui::SameLine(core[0].viewport[2] / 2 - 200);
                         ImGui::SetCursorPosY(290);
@@ -352,6 +383,8 @@ namespace igl
                         ImGui::SameLine(core[0].viewport[2] / 2 - 200);
                         if (ImGui::Button("Return to main menu", ImVec2(400, 45)))
                         {
+                            viewer->insertScore(viewer->playerName, viewer->score);
+                            viewer->score = 0;
                             viewer->setPause();
                             viewer->setMainMenu();
                         }
@@ -360,11 +393,14 @@ namespace igl
                         ImGui::SameLine(core[0].viewport[2] / 2 - 200);
                         if (ImGui::Button("Exit the game", ImVec2(400, 45)))
                         {
+                            viewer->insertScore(viewer->playerName, viewer->score);
+                            viewer->score = 0;
                             viewer->shouldClose = true;
                         }
                     }
                     else if (viewer->isStart)
                     {
+
                     for (int i = 0; i < viewer->data_list.size(); ++i)
                     {
                         core[1].set(viewer->data(i).show_faces, true);
@@ -375,6 +411,103 @@ namespace igl
                         ImGui::Text("Score: %d", (viewer->score));
 
                     }
+                    else if (viewer->isHighScore) {
+                    ImGui::SetWindowFontScale(4.f);
+                    ImGui::SameLine(core[0].viewport[2] / 2 - 150);
+                    ImGui::SetCursorPosY(100);
+
+                    ImGui::Text("High Score:", ImVec2(400, 0));
+                    ImGui::SetWindowFontScale(2.f);
+                    ImGui::NewLine();
+                    ImGui::NewLine();
+                    ImGui::SameLine(core[0].viewport[2] / 2 - 200);
+                        std::string path = "highscore.txt";
+
+                        fstream highScoreFileRead(path, ios::out | ios::in);
+                        vector<pair<int, string> > score_vector;
+                        int currScore;
+                        string currName;
+                        if (highScoreFileRead.is_open()) {
+                            while (highScoreFileRead >> currName >> currScore) {
+                                score_vector.push_back(make_pair(currScore, currName));
+                            }
+                            highScoreFileRead.close();
+                        }
+                        else {
+                            cout << "Could Not Open The File For Reading" << endl;
+                        }
+                        int counter = 1;
+                        for (auto it = score_vector.begin(); it != score_vector.end(); ++it) {
+                            std::string str = to_string(counter)+ ".";
+                            ImGui::SameLine(core[0].viewport[2] / 2 - 145);
+                            str+= it->second + " " + to_string(it->first);
+                            const char* c = str.c_str();
+                            ImGui::Text(c, ImVec2(400, 0));
+                            ImGui::NewLine();
+                            ImGui::SameLine(core[0].viewport[2] / 2 - 200);
+                            //ImGui::NewLine();
+                            counter++;
+                        }
+                        ImGui::NewLine();
+                        ImGui::NewLine();
+                        ImGui::NewLine();
+
+                        ImGui::SameLine(core[0].viewport[2] / 2 - 420);
+
+                        if (ImGui::Button("Return"))
+                        {
+                            viewer->setMainMenu();
+
+                            viewer->setHighScore();
+                        }
+                    }
+                    else if (viewer->isBetweenLevels) {
+                    for (int i = 0; i < viewer->data_list.size(); ++i)
+                    {
+                        core[1].set(viewer->data(i).show_faces, false);
+
+                    }
+
+                    ImGui::SameLine(core[0].viewport[2] / 2 - 220);
+                    ImGui::SetCursorPosY(100);
+                    ImGui::SetWindowFontScale(3.5f);
+
+                    ImGui::Text("Current Score: %d", (viewer->score));
+                    ImGui::NewLine();
+
+                    ImGui::SameLine(core[0].viewport[2] / 2 - 200);
+                    ImGui::SetCursorPosY(290);
+
+                    ImGui::SetWindowFontScale(1.5f);
+
+                    if (ImGui::Button("Continue to level 2", ImVec2(400, 45)))
+                    {
+                        viewer->SetAnimation();
+
+                        viewer->setBetweenLevels();
+                        viewer->setStart();
+                        viewer->setSecondLevel();
+                    }
+                    ImGui::NewLine();
+
+                    ImGui::SameLine(core[0].viewport[2] / 2 - 200);
+                    if (ImGui::Button("Return to main menu", ImVec2(400, 45)))
+                    {
+                        viewer->insertScore(viewer->playerName, viewer->score);
+                        viewer->score = 0;
+                        viewer->setBetweenLevels();
+                        viewer->setMainMenu();
+                    }
+                    ImGui::NewLine();
+
+                    ImGui::SameLine(core[0].viewport[2] / 2 - 200);
+                    if (ImGui::Button("Exit the game", ImVec2(400, 45)))
+                    {   
+                        viewer->insertScore(viewer->playerName, viewer->score);
+                        viewer->score = 0;
+                        viewer->shouldClose = true;
+                    }
+                   }
 
 
 

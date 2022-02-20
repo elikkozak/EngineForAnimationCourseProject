@@ -45,6 +45,18 @@ class ViewerData : public Movable
 {
 public:
   ViewerData();
+
+  unsigned int loadCubemap(std::vector<std::string> faces);
+
+  std::vector<std::string> faces
+  {
+      "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/right.bmp",
+          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/left.bmp",
+          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/top.bmp",
+          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/bottom.bmp",
+          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/front.bmp",
+          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/back.bmp"
+  };
   
   // Empty all fields
   IGL_INLINE void clear();

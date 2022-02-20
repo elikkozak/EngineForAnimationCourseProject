@@ -27,7 +27,7 @@ SandBox::SandBox()
 Eigen::MatrixXd SandBox:: calcWeights()
 {
 
-	int num_of_verticies = data().V.rows();
+	int num_of_verticies = data(snake_pos).V.rows();
 	Eigen::MatrixXd W = Eigen::MatrixXd(num_of_verticies, 16);
 
 	for (int i = 0; i < W.rows(); ++i)
@@ -42,7 +42,7 @@ Eigen::MatrixXd SandBox:: calcWeights()
 	for (int i = 0; i < num_of_verticies; ++i)
 	{
 		
-		double loc = (data().V(i,2) / 0.1) + 8;
+		double loc = (data(snake_pos).V(i,2) / 0.1) + 8;
 		if(loc < 0)
 		{
 			loc = 0;
@@ -161,14 +161,14 @@ void SandBox::pre_draw()
 
 	igl::deform_skeleton(C, BE, T, CT, BET);
 
-	data().set_vertices(U);
-	data().set_points(CT, skeleton_joint_color);
-	data().set_edges(CT, BET, skeleton_bone_color);
-	data().compute_normals();
+	data(snake_pos).set_vertices(U);
+	data(snake_pos).set_points(CT, skeleton_joint_color);
+	data(snake_pos).set_edges(CT, BET, skeleton_bone_color);
+	data(snake_pos).compute_normals();
 
 	
 	our_vec<< CT(0, 0), CT(0, 1), CT(0, 2), 1;
-	our_vec = data().MakeTransd() * our_vec;
+	our_vec = data(snake_pos).MakeTransd() * our_vec;
 	head_loc = our_vec.head<3>();
 	
 	anim_t += anim_t_dir;
@@ -176,223 +176,6 @@ void SandBox::pre_draw()
 	
 }
 
-bool SandBox::check_collision_cond(Eigen::AlignedBox<double, 3> box_1, Eigen::AlignedBox<double, 3> box_2, Eigen::Matrix3d& R_mat, Eigen::Matrix4d& A_trans, Eigen::Matrix4d& B_trans, Eigen::Matrix3d& A_rot, Eigen::Matrix3d& B_rot)
-{
-	double R, R_0, R_1;
-
-	Eigen::Vector4d A_vec_center = Eigen::Vector4d(box_1.center()[0], box_1.center()[1], box_1.center()[2], 1);
-	Eigen::Vector4d A_vec_center_trans = A_trans * A_vec_center;
-	Eigen::RowVector3d P_A = Eigen::RowVector3d(A_vec_center_trans.x(), A_vec_center_trans.y(), A_vec_center_trans.z());
-
-	Eigen::RowVector3d A_x = A_rot * Eigen::Vector3d(1, 0, 0);
-	Eigen::RowVector3d A_y = A_rot * Eigen::Vector3d(0, 1, 0);
-	Eigen::RowVector3d A_z = A_rot * Eigen::Vector3d(0, 0, 1);
-	double W_A = box_1.sizes()[0] / 2;
-	double H_A = box_1.sizes()[1] / 2;
-	double D_A = box_1.sizes()[2] / 2;
-
-
-
-	Eigen::Vector4d B_vec_center = Eigen::Vector4d(box_2.center()[0], box_2.center()[1], box_2.center()[2], 1);
-	Eigen::Vector4d B_vec_center_trans = B_trans * B_vec_center;
-	Eigen::RowVector3d P_B = Eigen::RowVector3d(B_vec_center_trans.x(), B_vec_center_trans.y(), B_vec_center_trans.z());
-
-	Eigen::RowVector3d B_x = B_rot * Eigen::Vector3d(1, 0, 0);
-	Eigen::RowVector3d B_y = B_rot * Eigen::Vector3d(0, 1, 0);
-	Eigen::RowVector3d B_z = B_rot * Eigen::Vector3d(0, 0, 1);
-	double W_B = box_2.sizes()[0] / 2;
-	double H_B = box_2.sizes()[1] / 2;
-	double D_B = box_2.sizes()[2] / 2;
-
-
-
-	Eigen::RowVector3d T = P_B - P_A;
-	//Eigen::Matrix3d R_mat = A * B;
-
-
-	//CASE 1:
-	R_0 = W_A;
-	R_1 = W_B * abs(R_mat(0, 0)) + H_B * abs(R_mat(0, 1)) + D_B * abs(R_mat(0, 2));
-	R = abs(T.dot(A_x));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 2:
-	R_0 = H_A;
-	R_1 = W_B * abs(R_mat(1, 0)) + H_B * abs(R_mat(1, 1)) + D_B * abs(R_mat(1, 2));
-	R = abs(T.dot(A_y));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 3:
-	R_0 = D_A;
-	R_1 = W_B * abs(R_mat(2, 0)) + H_B * abs(R_mat(2, 1)) + D_B * abs(R_mat(2, 2));
-	R = abs(T.dot(A_z));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 4:
-	R_0 = W_A * abs(R_mat(0, 0)) + H_A * abs(R_mat(1, 0)) + D_A * abs(R_mat(2, 0));
-	R_1 = W_B;
-	R = abs(T.dot(B_x));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 5:
-	R_0 = W_A * abs(R_mat(0, 1)) + H_A * abs(R_mat(1, 1)) + D_A * abs(R_mat(2, 1));
-	R_1 = H_B;
-	R = abs(T.dot(B_y));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 6:
-	R_0 = W_A * abs(R_mat(0, 2)) + H_A * abs(R_mat(1, 2)) + D_A * abs(R_mat(2, 2));
-	R_1 = D_B;
-	R = abs(T.dot(B_z));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 7:
-	R_0 = H_A * abs(R_mat(2, 0)) + D_A * abs(R_mat(1, 0));
-	R_1 = H_B * abs(R_mat(0, 2)) + D_B * abs(R_mat(0, 1));
-	R = abs(R_mat(1, 0) * T.dot(A_z) - R_mat(2, 0) * T.dot(A_y));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 8:
-	R_0 = H_A * abs(R_mat(2, 1)) + D_A * abs(R_mat(1, 1));
-	R_1 = W_B * abs(R_mat(0, 2)) + D_B * abs(R_mat(0, 0));
-	R = abs(R_mat(1, 1) * T.dot(A_z) - R_mat(2, 1) * T.dot(A_y));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 9:
-	R_0 = H_A * abs(R_mat(2, 2)) + D_A * abs(R_mat(1, 2));
-	R_1 = W_B * abs(R_mat(0, 1)) + H_B * abs(R_mat(0, 0));
-	R = abs(R_mat(1, 2) * T.dot(A_z) - R_mat(2, 2) * T.dot(A_y));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 10:
-	R_0 = W_A * abs(R_mat(2, 0)) + D_A * abs(R_mat(0, 0));
-	R_1 = H_B * abs(R_mat(1, 2)) + D_B * abs(R_mat(1, 1));
-	R = abs(R_mat(2, 0) * T.dot(A_x) - R_mat(0, 0) * T.dot(A_z));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 11:
-	R_0 = W_A * abs(R_mat(2, 1)) + D_A * abs(R_mat(0, 1));
-	R_1 = W_B * abs(R_mat(1, 2)) + D_B * abs(R_mat(1, 0));
-	R = abs(R_mat(2, 1) * T.dot(A_x) - R_mat(0, 1) * T.dot(A_z));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 12:
-	R_0 = W_A * abs(R_mat(2, 2)) + D_A * abs(R_mat(0, 2));
-	R_1 = W_B * abs(R_mat(1, 1)) + H_B * abs(R_mat(1, 0));
-	R = abs(R_mat(2, 2) * T.dot(A_x) - R_mat(0, 2) * T.dot(A_z));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 13:
-	R_0 = W_A * abs(R_mat(1, 0)) + H_A * abs(R_mat(0, 0));
-	R_1 = H_B * abs(R_mat(2, 2)) + D_B * abs(R_mat(2, 1));
-	R = abs(R_mat(0, 0) * T.dot(A_y) - R_mat(1, 0) * T.dot(A_x));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 14:
-	R_0 = W_A * abs(R_mat(1, 1)) + H_A * abs(R_mat(0, 1));
-	R_1 = W_B * abs(R_mat(2, 2)) + D_B * abs(R_mat(2, 0));
-	R = abs(R_mat(0, 1) * T.dot(A_y) - R_mat(1, 1) * T.dot(A_x));
-	if (R > R_0 + R_1)
-		return false;
-
-	//CASE 15:
-	R_0 = W_A * abs(R_mat(1, 2)) + H_A * abs(R_mat(0, 2));
-	R_1 = W_B * abs(R_mat(2, 1)) + H_B * abs(R_mat(2, 0));
-	R = abs(R_mat(0, 2) * T.dot(A_y) - R_mat(1, 2) * T.dot(A_x));
-	if (R > R_0 + R_1)
-		return false;
-
-	return true;
-}
-
-bool SandBox::check_collision_rec(igl::AABB<Eigen::MatrixXd, 3>* node1, igl::AABB<Eigen::MatrixXd, 3>* node2, Eigen::Matrix3d& R_mat, Eigen::Matrix4d& A_trans, Eigen::Matrix4d& B_trans, Eigen::Matrix3d& A_rot, Eigen::Matrix3d& B_rot)
-{
-	if (check_collision_cond(node1->m_box, node2->m_box, R_mat, A_trans, B_trans, A_rot, B_rot))
-	{
-		if (node1->is_leaf() && node2->is_leaf())
-		{
-			data_list[0].drawBox(node1->m_box);
-			data_list[1].drawBox(node2->m_box);
-
-
-			dir = -1 * dir;
-			return true;
-		}
-
-		igl::AABB<Eigen::MatrixXd, 3>* left1 = node1->is_leaf() ? node1 : node1->m_left;
-		igl::AABB<Eigen::MatrixXd, 3>* right1 = node1->is_leaf() ? node1 : node1->m_right;
-		igl::AABB<Eigen::MatrixXd, 3>* left2 = node2->is_leaf() ? node2 : node2->m_left;;
-		igl::AABB<Eigen::MatrixXd, 3>* right2 = node2->is_leaf() ? node2 : node2->m_right;
-
-		if (check_collision_rec(left1, left2, R_mat, A_trans, B_trans, A_rot, B_rot))
-			return true;
-		else if (check_collision_rec(left1, right2, R_mat, A_trans, B_trans, A_rot, B_rot))
-			return true;
-		else if (check_collision_rec(right1, left2, R_mat, A_trans, B_trans, A_rot, B_rot))
-			return true;
-		else if (check_collision_rec(right1, right2, R_mat, A_trans, B_trans, A_rot, B_rot))
-			return true;
-		else return false;
-
-	}
-	return false;
-}
-
-void SandBox::check_collision()
-{
-	igl::AABB<Eigen::MatrixXd, 3>* node1 = &data_list[0].tree;
-	igl::AABB<Eigen::MatrixXd, 3>* node2 = &data_list[1].tree;
-
-	Eigen::Matrix4d A_trans = data_list[0].MakeTransd();
-	Eigen::Matrix3d A_rot = data_list[0].GetRotation();
-
-	Eigen::Matrix4d B_trans = data_list[1].MakeTransd();
-	Eigen::Matrix3d B_rot = data_list[1].GetRotation();
-
-	Eigen::RowVector3d A_x = A_rot * Eigen::Vector3d(1, 0, 0);
-	Eigen::RowVector3d A_y = A_rot * Eigen::Vector3d(0, 1, 0);
-	Eigen::RowVector3d A_z = A_rot * Eigen::Vector3d(0, 0, 1);
-
-
-	Eigen::Matrix3d A;
-	A << A_x[0], A_x[1], A_x[2],
-		A_y[0], A_y[1], A_y[2],
-		A_z[0], A_z[1], A_z[2];
-
-
-	Eigen::RowVector3d B_x = B_rot * Eigen::Vector3d(1, 0, 0);
-	Eigen::RowVector3d B_y = B_rot * Eigen::Vector3d(0, 1, 0);
-	Eigen::RowVector3d B_z = B_rot * Eigen::Vector3d(0, 0, 1);
-
-	Eigen::Matrix3d B;
-	B << B_x[0], B_y[0], B_z[0],
-		B_x[1], B_y[1], B_z[1],
-		B_x[2], B_y[2], B_z[2];
-
-	Eigen::Matrix3d R_mat = A * B;
-
-
-
-
-
-	if (check_collision_rec(node1, node2, R_mat, A_trans, B_trans, A_rot, B_rot)) {
-		std::cout << "Collision detected! " << std::endl;
-		isMoving = false;
-	}
-}
 
 void SandBox::new_check_collision(int i, Eigen::Vector3d head_loc)
 {
@@ -400,11 +183,37 @@ void SandBox::new_check_collision(int i, Eigen::Vector3d head_loc)
 	Eigen::Vector3d ball_loc_vec3 = ball_loc_vec4.head<3>();
 	if((head_loc-ball_loc_vec3).norm()<1)
 	{
+		if (i <= 3) {
+			std::cout << "HIT\n";
+		}
+		else {
+			std::cout << "GAME OVER\n";
+			setStart();
+			SetAnimation();
+			setMainMenu();
+			isCameraUp = true;
+			insertScore(playerName, score);
+		}
 		
-		std::cout << "HIT\n";
-		data(i).MyTranslate(Eigen::Vector3d(0,0,5),true) ;
-		//data_list[i].set_face
+		if(isSecondLevel)
+			score = score + 200;
+		else
+			score = score + 100;
+
+		int sign1 = (rand() % 2) * 2 - 1;
+		int sign2 = (rand() % 2) * 2 - 1;
+		data(i).MyTranslate(Eigen::Vector3d(sign1*(7 + (std::rand() % 4)),0, sign2*(7 + (std::rand() % 4))),true) ;
+
+		if (score == 400) {
+			setStart();
+			SetAnimation();
+			betweenLevelsOrganize();
+			setBetweenLevels();
+			isCameraUp = true;
+
+		}
 	}
+	
 }
 
 void SandBox::Init(const std::string &config)
@@ -438,33 +247,29 @@ void SandBox::Init(const std::string &config)
 		}
 		nameFileout.close();
 	}
+	snake_pos = data_list.size() - 1;
 	append_joint();
-	//MyTranslate(Eigen::Vector3d(0, 0, -1), true);
 	
 	
 	init_skinning_stuff();
 	scale_snake();
 	draw_skeleton();
+
+
+	organizeLevel();
+
 	
-	//DRAW A BOX
-	data().tree.init(data().V, data().F);
-	igl::AABB<Eigen::MatrixXd, 3> tree = data().tree;
-	Eigen::AlignedBox<double, 3> box = tree.m_box;
-	data().drawBox(box);
-	data(0).MyTranslate(Eigen::Vector3d(0, 0, -20), true);
-	data(1).MyTranslate(Eigen::Vector3d(10, 0, -20), true);
-	data().set_colors(Eigen::RowVector3d(0.9, 0.1, 0.1));
-	//data().MyScale(Eigen::Vector3d(1, 1, 16));
-	
+	data(0).MyScale(Eigen::Vector3d(200, 200, 200));
+
 	mciSendString("open \"C:\\Users\\elikk\\Desktop\\TRY\\EngineForAnimationCourse\\tutorial\\data\\musicforgame.wav\" type mpegvideo alias wav", NULL, 0, NULL);
 	//mciSendString("play wav", NULL, 0, NULL);
 }
 
 void SandBox::init_skinning_stuff()
 {
-	V = data().V;
+	V = data(snake_pos).V;
 	U = V;
-	F = data().F;
+	F = data(snake_pos).F;
 	int num_of_joints = joint().joint_pos.size();
 	C = Eigen::MatrixXd(num_of_joints, 3);
 	for(int i = 0; i < num_of_joints;i++)
@@ -505,15 +310,16 @@ void SandBox::scale_snake()
 	{
 		curr_v =  V.row(i);
 
-		V.row(i) = Eigen::Vector3d(curr_v[0], curr_v[1], curr_v[2] * 16);
+		V.row(i) = Eigen::Vector3d(curr_v[0], curr_v[1], curr_v[2]*16 );
 	}
-	data().set_vertices(V);
-	data().compute_normals();
+	data(snake_pos).set_vertices(V);
+	data(snake_pos).compute_normals();
 }
 
 
 void SandBox::draw_skeleton()
 {
+	data().point_size = 7;
 	skeleton_joint_color.resize(C.rows(), 3);
 	skeleton_bone_color.resize(BE.rows(), 3);
 	for (int i = 0; i < C.rows(); ++i)
@@ -524,8 +330,8 @@ void SandBox::draw_skeleton()
 	{
 		skeleton_bone_color.row(i) = sea_green;
 	}
-	data().add_points(C, skeleton_joint_color);
-	data().set_edges(C,BE , skeleton_bone_color);
+	data(snake_pos).add_points(C, skeleton_joint_color);
+	data(snake_pos).set_edges(C,BE , skeleton_bone_color);
 }
 
 void SandBox::update_next_pose()
@@ -557,7 +363,6 @@ void SandBox::update_next_pose()
 	}
 	
 
-
 	Eigen::Quaterniond turn1(Eigen::AngleAxisd(angle, curr_pose[0].toRotationMatrix().transpose()*axis));
 	Eigen::Quaterniond turn2(Eigen::AngleAxisd(-angle, curr_pose[0].toRotationMatrix().transpose()*axis));
 	next_pose[0] = curr_pose[0]*turn1;
@@ -577,18 +382,20 @@ void SandBox::move_balls()
 		sign *= -1;
 		
 	}
-	for (int i = 0; i < data_list.size()-1; ++i)
+	for (int i = 1; i < data_list.size()-1; ++i)
 	{
-		if(i%2==0)
+		if(i%3==0)
 		{
 			move_dir = Eigen::Vector3d::UnitY();
 		}
-		else
+		else if (i % 3 == 1)
 		{
 			move_dir = Eigen::Vector3d::UnitX();
 
 		}
-		data_list[i].MyTranslate(move_dir * ( sign * 0.10), true);
+		else
+			move_dir = Eigen::Vector3d::UnitZ();
+		data_list[i].MyTranslate(move_dir * ( sign * 0.5), true);
 	}
 	border += sign;
 }
@@ -605,6 +412,48 @@ void SandBox::ResumeMusic()
 
 }
 
+void SandBox::betweenLevelsOrganize()
+{	
+	_dir = NONE;
+	anim_t = anim_t_dir;
+	for (int i = 0; i < rest_pose.size(); ++i)
+	{
+		rest_pose[i] = Eigen::Quaterniond::Identity();
+	}
+	curr_pose = rest_pose;
+	next_pose = curr_pose;
+
+	dir_change = false;
+
+	Eigen::Vector3d trans;
+	
+	for (int i = 1; i < data_list.size(); i++) {
+		trans = (data(i).MakeTransd() * Eigen::Vector4d::UnitW()).head<3>();
+		data(i).MyTranslate(-trans, true);
+	}
+	organizeLevel();
+
+}
+
+void SandBox::organizeLevel()
+{
+	int sign1;
+	int sign2;
+	for (int i = 1; i < snake_pos; i++) {
+		sign1 =  (rand() % 2) * 2 - 1;
+		sign2 = (rand() % 2) * 2 - 1;
+
+		if(i>0 && i<4)
+			data(i).MyTranslate(Eigen::Vector3d(sign1 * (7 + (std::rand() % 4)), 0, sign2 * (7 + (std::rand() % 4))), true);
+		else
+			data(i).MyTranslate(Eigen::Vector3d(sign1 * (10 + (std::rand() % 4)), 0, sign2 * (10 + (std::rand() % 4))), true);
+	}
+}
+
+
+
+
+
 void SandBox::Animate(igl::opengl::ViewerCore &core)
 {
 	
@@ -620,26 +469,22 @@ void SandBox::Animate(igl::opengl::ViewerCore &core)
 		}
 		else
 		{
-			Eigen::Matrix4d transMat = data().MakeTransd();
+			Eigen::Matrix4d transMat = data(snake_pos).MakeTransd();
 			core.camera_eye = (rot_quaternion.toRotationMatrix()  *Eigen::Vector3d(0, 0, 0.8)).block(0, 0, 3, 1).cast<float>();
-			//core.camera_eye = Eigen::Vector3d(0, 0, 0);
-			core.camera_up = (rot_quaternion.toRotationMatrix() * Eigen::Vector3d(0, 1, 0)).block(0, 0, 3, 1).cast<float>();
-			//core.camera_center = *Eigen::Vector3d(0, 0, -1);
+			core.camera_up = Eigen::Vector3d(0, 1, 0).cast<float>();
 			core.camera_translation = ((transMat * Eigen::Vector4d(0, 0, 13.5, -1)).block(0,0,3,1)).block(0, 0, 3, 1).cast<float>();
-			//core.camera_translation = ((rot_quaternion.toRotationMatrix() * Eigen::Vector3d(0, 0, 13.8)).block(0, 0, 3, 1)).cast<float>();
 			core.camera_zoom = 1.f;
 		}
 		
-
-		//move_balls();
-		for (int i = 0; i < data_list.size()-1; ++i)
+		if(isSecondLevel)
+			move_balls();
+		for (int i = 1; i < data_list.size()-1; ++i)
 		{
 			new_check_collision(i, head_loc);
 
 		}
 		pre_draw();
-		data().MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.25, true);
-
+		data(snake_pos).MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.25, true);
 		
 		if (anim_t > 1)
 		{
@@ -650,7 +495,7 @@ void SandBox::Animate(igl::opengl::ViewerCore &core)
 			curr_pose = next_pose;
 			for (int i = next_pose.size() - 1; i > 1; --i)
 			{
-				next_pose[i] = curr_pose[i - 1];
+				next_pose[i] = curr_pose[i-1];
 			}
 
 			if (dir_change)

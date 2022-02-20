@@ -15,6 +15,8 @@
 #include "../per_vertex_normals.h"
 #include "igl/png/texture_from_png.h"
 #include <iostream>
+#include "external/stb/stb_image.h"
+
 //#include "external/stb/igl_stb_image.h"
 
 IGL_INLINE igl::opengl::ViewerData::ViewerData()
@@ -89,9 +91,9 @@ void igl::opengl::ViewerData::drawBox(Eigen::AlignedBox<double, 3> box) {
     line_width = 2;
     Eigen::RowVector3d colorVec;
 
-    colorVec = Eigen::RowVector3d(100, 100, 100); 
+    colorVec = Eigen::RowVector3d(100, 100, 100);
 
-	Eigen::RowVector3d v_0 = box.corner(box.BottomLeftFloor);  //vertices of box are like this
+    Eigen::RowVector3d v_0 = box.corner(box.BottomLeftFloor);  //vertices of box are like this
     Eigen::RowVector3d v_1 = box.corner(box.TopLeftFloor);//        v5-----v6 
     Eigen::RowVector3d v_2 = box.corner(box.TopRightFloor);//      /|      /|  
     Eigen::RowVector3d v_3 = box.corner(box.BottomRightFloor);//  v4------v7|
@@ -99,6 +101,11 @@ void igl::opengl::ViewerData::drawBox(Eigen::AlignedBox<double, 3> box) {
     Eigen::RowVector3d v_5 = box.corner(box.TopLeftCeil);//       |v1------v2 
     Eigen::RowVector3d v_6 = box.corner(box.TopRightCeil); //     |/      |/  
     Eigen::RowVector3d v_7 = box.corner(box.BottomRightCeil);//   v0------v3
+
+    v_5 = Eigen::RowVector3d(v_5[0], v_5[1], -11.2);
+    v_6 = Eigen::RowVector3d(v_6[0], v_6[1], -11.2);
+    v_4 = Eigen::RowVector3d(v_4[0], v_4[1], -11.2);
+    v_7= Eigen::RowVector3d(v_7[0], v_7[1], -11.2);
 
     add_edges(v_0, v_1, colorVec);
     add_edges(v_0, v_3, colorVec);
@@ -119,25 +126,7 @@ void igl::opengl::ViewerData::drawBox(Eigen::AlignedBox<double, 3> box) {
 
     add_edges(v_6, v_7, colorVec);
 
-    Eigen::RowVector3d colorVecR;
-    Eigen::RowVector3d colorVecG;
-    Eigen::RowVector3d colorVecB;
 
-    colorVecR = Eigen::RowVector3d(255, 0, 0);
-    colorVecG = Eigen::RowVector3d(0, 255, 0);
-    colorVecB = Eigen::RowVector3d(0, 0, 255);
-
-    // Eigen::RowVector3d center = box.center();
-    // Eigen::RowVector3d center_x_1 = center + Eigen::RowVector3d(0.8, 0, 0);
-    // Eigen::RowVector3d center_x_2 = center + Eigen::RowVector3d(-0.8, 0, 0);
-    // Eigen::RowVector3d center_y_1 = center + Eigen::RowVector3d(0, 0.8, 0);
-    // Eigen::RowVector3d center_y_2 = center + Eigen::RowVector3d(0, -0.8, 0);
-    // Eigen::RowVector3d center_z_1 = center + Eigen::RowVector3d(0, 0, 0.8);
-    // Eigen::RowVector3d center_z_2 = center + Eigen::RowVector3d(0, 0, -0.8);
-    //
-    // add_edges(center_x_1, center_x_2, colorVecR);
-    // add_edges(center_y_1, center_y_2, colorVecG);
-    // add_edges(center_z_1, center_z_2, colorVecB);
 }
 
 
@@ -454,6 +443,38 @@ IGL_INLINE void igl::opengl::ViewerData::clear_labels()
 {
   labels_positions.resize(0,3);
   labels_strings.clear();
+}
+
+unsigned int igl::opengl::ViewerData::loadCubemap(std::vector<std::string> faces)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+            );
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
 
 IGL_INLINE void igl::opengl::ViewerData::clear()

@@ -40,6 +40,14 @@ IGL_INLINE void igl::opengl::MeshGL::init_buffers()
   glGenBuffers(1, &vbo_points_V);
   glGenBuffers(1, &vbo_points_V_colors);
 
+
+  glGenTextures(1, &textureID);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+  glGenVertexArrays(1, &skyboxVAO);
+  glGenBuffers(1, &skyboxVBO);
+  glGenBuffers(1, &skyboxEBO);
+
   dirty = MeshGL::DIRTY_ALL;
 }
 
@@ -85,7 +93,7 @@ IGL_INLINE void igl::opengl::MeshGL::bind_mesh()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned)*F_vbo.size(), F_vbo.data(), GL_DYNAMIC_DRAW);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, vbo_tex);
+  //glBindTexture(GL_TEXTURE_2D, vbo_tex);
   if (dirty & MeshGL::DIRTY_TEXTURE)
   {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -97,6 +105,17 @@ IGL_INLINE void igl::opengl::MeshGL::bind_mesh()
   }
   glUniform1i(glGetUniformLocation(shader_mesh,"tex"), 0);
   dirty &= ~MeshGL::DIRTY_MESH;
+}
+
+IGL_INLINE void igl::opengl::MeshGL::bind_cubemap()
+{
+    // Create VAO, VBO, and EBO for the skybox
+    //glDepthMask(GL_FALSE);
+
+
+    glUseProgram(cubemap);
+    //glUniform1i(glGetUniformLocation(cubemap, "skybox"), 0);
+
 }
 
 IGL_INLINE void igl::opengl::MeshGL::bind_overlay_lines()
@@ -155,6 +174,14 @@ IGL_INLINE void igl::opengl::MeshGL::draw_overlay_lines()
 IGL_INLINE void igl::opengl::MeshGL::draw_overlay_points()
 {
   glDrawElements(GL_POINTS, points_F_vbo.rows(), GL_UNSIGNED_INT, 0);
+}
+
+IGL_INLINE void igl::opengl::MeshGL::draw_cubemap()
+{
+    //glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+    glDepthMask(GL_TRUE);
 }
 
 IGL_INLINE void igl::opengl::MeshGL::init()
@@ -274,6 +301,52 @@ R"(#version 150
   }
 )";
 
+  std::string cubemap_vertex_shader_string =
+      R"(#version 330 core
+		layout (location = 0) in vec3 aPos;
+
+		out vec3 TexCoords;
+
+		uniform mat4 proj;
+		uniform mat4 view;
+
+out float visibility;
+const float density = 0.008;
+const float gradient = 2;
+
+
+		void main()
+		{
+		    TexCoords = aPos;
+		    gl_Position = proj * view * vec4(aPos, 1.0);
+
+            
+    vec4 positionRelativeToCam = view * vec4 (aPos, 1.0);
+    float distance = length(positionRelativeToCam.xyz);
+    visibility = exp(-pow((distance*density),gradient));
+    visibility = clamp(visibility,0.0,1.0);
+
+		}  
+)";
+
+  std::string cubemap_fragment_shader_string =
+      R"(#version 330 core
+			out vec4 FragColor;
+
+			in vec3 TexCoords;
+
+			uniform samplerCube skybox;
+
+            in float visibility;
+
+
+			void main()
+			{    
+			    FragColor = texture(skybox, TexCoords);
+              //  FragColor = mix(FragColor,vec4(0.5,0.5,0.5,1),visibility);
+			}
+)";
+
   init_buffers();
   create_shader_program(
     mesh_vertex_shader_string,
@@ -291,6 +364,12 @@ R"(#version 150
     overlay_point_fragment_shader_string,
     {},
     shader_overlay_points);
+
+  create_shader_program(
+      cubemap_vertex_shader_string,
+      cubemap_fragment_shader_string,
+      {},
+      cubemap);
 }
 
 IGL_INLINE void igl::opengl::MeshGL::free()

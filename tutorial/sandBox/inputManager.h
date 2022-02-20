@@ -26,13 +26,13 @@ static void glfw_mouse_press(GLFWwindow* window, int button, int action, int mod
 	  for (; i < scn->data_list.size(); i++)
 	  {
 		  scn->selected_data_index = i;
-		  depth = rndr->Picking(x2, y2);
-		  if (depth < 0 && (closestZ > 0 || closestZ < depth))
-		  {
-			  savedIndx = i;
-			  closestZ = depth;
-			  std::cout << "found " << depth << std::endl;
-		  }
+		 // depth = rndr->Picking(x2, y2);
+		  //if (depth < 0 && (closestZ > 0 || closestZ < depth))
+		  //{
+			 // savedIndx = i;
+			 // closestZ = depth;
+			 // //std::cout << "found " << depth << std::endl;
+		  //}
 	  }
 	  scn->selected_data_index = savedIndx;
 	  scn->data().set_colors(Eigen::RowVector3d(0.9, 0.1, 0.1));

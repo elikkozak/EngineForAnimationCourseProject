@@ -209,6 +209,12 @@ R"(#version 150
   out vec4 Kdi;
   out vec4 Ksi;
 
+uniform float density; 
+uniform float gradient;
+out float visibility;
+//const float density = 0.75;
+//const float gradient = 5;
+
   void main()
   {
     position_eye = vec3 (view * vec4 (position, 1.0));
@@ -219,6 +225,11 @@ R"(#version 150
     Kdi = Kd;
     Ksi = Ks;
     texcoordi = texcoord;
+
+vec4 positionRelativeToCam = view * vec4 (position, 1.0);
+    float distance = length(positionRelativeToCam.xyz);
+    visibility = exp(-pow((distance*density),gradient));
+    visibility = clamp(visibility,0.0,1.0);
   }
 )";
 
@@ -242,6 +253,9 @@ R"(#version 150
   uniform float lighting_factor;
   uniform float texture_factor;
   out vec4 outColor;
+
+ in float visibility;
+
   void main()
   {
     vec3 Ia = La * vec3(Kai);    // ambient intensity
@@ -260,6 +274,9 @@ R"(#version 150
     vec3 Is = Ls * vec3(Ksi) * specular_factor;    // specular intensity
     vec4 color = vec4(lighting_factor * (Is + Id) + Ia + (1.0-lighting_factor) * vec3(Kdi),(Kai.a+Ksi.a+Kdi.a)/3);
     outColor = mix(vec4(1,1,1,1), texture(tex, texcoordi), texture_factor) * color;
+    
+    outColor = mix(vec4(0.5,0.5,0.5,1), outColor, visibility);
+    
     if (fixed_color != vec4(0.0)) outColor = fixed_color;
   }
 )";
@@ -310,9 +327,11 @@ R"(#version 150
 		uniform mat4 proj;
 		uniform mat4 view;
 
+     float density = 0.04; 
+     float gradient = 1.5;
+
 out float visibility;
-const float density = 0.008;
-const float gradient = 2;
+
 
 
 		void main()
@@ -343,7 +362,7 @@ const float gradient = 2;
 			void main()
 			{    
 			    FragColor = texture(skybox, TexCoords);
-              //  FragColor = mix(FragColor,vec4(0.5,0.5,0.5,1),visibility);
+                FragColor = mix(FragColor,vec4(0.5,0.5,0.5,1),visibility);
 			}
 )";
 

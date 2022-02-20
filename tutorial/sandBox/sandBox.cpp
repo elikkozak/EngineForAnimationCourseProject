@@ -192,6 +192,8 @@ void SandBox::new_check_collision(int i, Eigen::Vector3d head_loc)
 			SetAnimation();
 			setMainMenu();
 			isCameraUp = true;
+			betweenLevelsOrganize();
+
 			insertScore(playerName, score);
 		}
 		
@@ -231,7 +233,7 @@ void SandBox::Init(const std::string &config)
 		
 		while (nameFileout >> item_name)
 		{
-			std::cout << "openning " << item_name << std::endl;
+			//std::cout << "openning " << item_name << std::endl;
 			load_mesh_from_file(item_name);
 			
 			parents.push_back(-1);
@@ -314,6 +316,8 @@ void SandBox::scale_snake()
 	}
 	data(snake_pos).set_vertices(V);
 	data(snake_pos).compute_normals();
+	
+
 }
 
 
@@ -440,13 +444,17 @@ void SandBox::organizeLevel()
 	int sign1;
 	int sign2;
 	for (int i = 1; i < snake_pos; i++) {
-		sign1 =  (rand() % 2) * 2 - 1;
+		sign1 = (rand() % 2) * 2 - 1;
 		sign2 = (rand() % 2) * 2 - 1;
 
-		if(i>0 && i<4)
+		if (i > 0 && i < 4) {
 			data(i).MyTranslate(Eigen::Vector3d(sign1 * (7 + (std::rand() % 4)), 0, sign2 * (7 + (std::rand() % 4))), true);
-		else
-			data(i).MyTranslate(Eigen::Vector3d(sign1 * (10 + (std::rand() % 4)), 0, sign2 * (10 + (std::rand() % 4))), true);
+			data(i).set_colors(Eigen::RowVector3d(0.9, 0.9, 0.1));
+		}
+		else {
+		data(i).MyTranslate(Eigen::Vector3d(sign1 * (10 + (std::rand() % 4)), 0, sign2 * (10 + (std::rand() % 4))), true);
+		data(i).set_colors(Eigen::RowVector3d(0.1, 0.9, 0.1));
+		}
 	}
 }
 
@@ -466,6 +474,8 @@ void SandBox::Animate(igl::opengl::ViewerCore &core)
 			core.camera_zoom = 5.f;
 			core.camera_translation = Eigen::Vector3f::Zero();
 			core.camera_up = Eigen::Vector3f(0, -1, 0);
+			core.density = 0.05f;
+			core.gradient = 1.5f;
 		}
 		else
 		{
@@ -474,6 +484,8 @@ void SandBox::Animate(igl::opengl::ViewerCore &core)
 			core.camera_up = Eigen::Vector3d(0, 1, 0).cast<float>();
 			core.camera_translation = ((transMat * Eigen::Vector4d(0, 0, 13.5, -1)).block(0,0,3,1)).block(0, 0, 3, 1).cast<float>();
 			core.camera_zoom = 1.f;
+			core.density = 0.75f;
+			core.gradient = 5.f;
 		}
 		
 		if(isSecondLevel)
@@ -484,7 +496,7 @@ void SandBox::Animate(igl::opengl::ViewerCore &core)
 
 		}
 		pre_draw();
-		data(snake_pos).MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.25, true);
+		data(snake_pos).MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.27, true);
 		
 		if (anim_t > 1)
 		{

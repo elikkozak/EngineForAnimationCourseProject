@@ -375,6 +375,7 @@ namespace igl
 
                         if (ImGui::Button("Return to game", ImVec2(400, 45)))
                         {
+                            viewer->SetAnimation();
                             viewer->setPause();
                             viewer->setStart();
                         }

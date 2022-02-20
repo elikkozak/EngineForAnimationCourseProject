@@ -174,6 +174,16 @@ IGL_INLINE void igl::opengl::ViewerCore::draw(
   GLint fixed_colori          = glGetUniformLocation(data.meshgl.shader_mesh,"fixed_color");
   GLint texture_factori       = glGetUniformLocation(data.meshgl.shader_mesh,"texture_factor");
 
+  //fog parameters 
+  GLfloat density_uniform = glGetUniformLocation(data.meshgl.shader_mesh, "density");
+  GLfloat gradient_uniform = glGetUniformLocation(data.meshgl.shader_mesh, "gradient");
+
+
+
+  glUniform1f(density_uniform, density);
+  glUniform1f(gradient_uniform, gradient);
+
+
   glUniform1f(specular_exponenti, data.shininess);
   glUniform3fv(light_position_eyei, 1, light_position.data());
   glUniform1f(lighting_factori, lighting_factor); // enables lighting
@@ -324,6 +334,15 @@ IGL_INLINE void igl::opengl::ViewerCore::drawCubeMap(
 
     glUniformMatrix4fv(viewi, 1, GL_FALSE, view.data());
     glUniformMatrix4fv(proji, 1, GL_FALSE, proj.data());
+
+    //fog parameters 
+    //GLfloat density_uniform = glGetUniformLocation(data.meshgl.cubemap, "density");
+    //GLfloat gradient_uniform = glGetUniformLocation(data.meshgl.cubemap, "gradient");
+
+
+
+    ///*glUniform1f(density_uniform, density);
+    //glUniform1f(gradient_uniform, gradient);*/
     //glActiveTexture(GL_TEXTURE0);
 
     data.meshgl.draw_cubemap();

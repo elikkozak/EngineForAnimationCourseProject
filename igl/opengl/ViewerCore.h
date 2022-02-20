@@ -27,6 +27,8 @@ class ViewerData;
 class ViewerCore
 {
 public:
+
+ 
   IGL_INLINE ViewerCore();
 
   // Initialization
@@ -136,6 +138,9 @@ public:
   float camera_view_angle;
   float camera_dnear;
   float camera_dfar;
+
+  float density = 0.05f;
+  float gradient = 1.5f;
 
   bool depth_test;
 

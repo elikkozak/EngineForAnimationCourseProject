@@ -263,8 +263,10 @@ void SandBox::Init(const std::string &config)
 	
 	data(0).MyScale(Eigen::Vector3d(200, 200, 200));
 
-	mciSendString("open \"C:\\Users\\elikk\\Desktop\\TRY\\EngineForAnimationCourse\\tutorial\\data\\musicforgame.wav\" type mpegvideo alias wav", NULL, 0, NULL);
-	//mciSendString("play wav", NULL, 0, NULL);
+	//mciSendString("open \"C:\\Users\\elikk\\Desktop\\ASS4\\EngineForAnimationCourse\\tutorial\\data\\musicforgame.wav\" type mpegvideo alias wav", NULL, 0, NULL);
+	mciSendString("open \"musicforgame.wav\" type mpegvideo alias wav", NULL, 0, NULL);
+
+	mciSendString("play wav", NULL, 0, NULL);
 }
 
 void SandBox::init_skinning_stuff()
@@ -487,7 +489,10 @@ void SandBox::Animate(igl::opengl::ViewerCore &core)
 			core.density = 0.75f;
 			core.gradient = 5.f;
 		}
-		
+		if (betweenLevelRestore) {
+			betweenLevelsOrganize();
+			betweenLevelRestore = false;
+		}
 		if(isSecondLevel)
 			move_balls();
 		for (int i = 1; i < data_list.size()-1; ++i)

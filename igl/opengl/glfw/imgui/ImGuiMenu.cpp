@@ -20,6 +20,7 @@
 //#include <GLFW/glfw3.h>
 #include <iostream>
 
+
 using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -388,6 +389,7 @@ namespace igl
                             viewer->score = 0;
                             viewer->setPause();
                             viewer->setMainMenu();
+                            viewer->betweenLevelRestore = true;
                         }
                         ImGui::NewLine();
 
@@ -498,6 +500,7 @@ namespace igl
                         viewer->score = 0;
                         viewer->setBetweenLevels();
                         viewer->setMainMenu();
+                        viewer->betweenLevelRestore = true;
                     }
                     ImGui::NewLine();
 

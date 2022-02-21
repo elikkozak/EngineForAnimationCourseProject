@@ -48,14 +48,23 @@ public:
 
   unsigned int loadCubemap(std::vector<std::string> faces);
 
+  //std::vector<std::string> faces
+  //{
+  //    "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/right.bmp",
+  //        "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/left.bmp",
+  //        "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/top.bmp",
+  //        "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/bottom.bmp",
+  //        "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/front.bmp",
+  //        "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/back.bmp"
+  //};
   std::vector<std::string> faces
   {
-      "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/right.bmp",
-          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/left.bmp",
-          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/top.bmp",
-          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/bottom.bmp",
-          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/front.bmp",
-          "C:/Users/elikk/Desktop/ASS4/EngineForAnimationCourse/tutorial/textures/back.bmp"
+      "./textures/right.bmp",
+          "./textures/left.bmp",
+         "./textures/top.bmp",
+        "./textures/bottom.bmp",
+        "./textures/front.bmp",
+         "./textures/back.bmp"
   };
   
   // Empty all fields

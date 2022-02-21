@@ -220,6 +220,8 @@ public:
         }
 
     }
+
+    bool betweenLevelRestore = false;
     
 
     

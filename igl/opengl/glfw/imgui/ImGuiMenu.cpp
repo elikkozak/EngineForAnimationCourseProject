@@ -220,6 +220,7 @@ namespace igl
 
 
 	                    }
+                        viewer->number_of_balls = 0;
                         ImGui::SetWindowFontScale(2.5f);
                         
                         ImGui::SameLine(core[0].viewport[2] / 2 - 200);
@@ -412,6 +413,9 @@ namespace igl
                         ImGui::SetWindowFontScale(2.f);
 
                         ImGui::Text("Score: %d", (viewer->score));
+                        if(!viewer->isSecondLevel)
+                            ImGui::Text("Balls Collected %d/4", (viewer->number_of_balls));
+
 
                     }
                     else if (viewer->isHighScore) {
@@ -470,7 +474,7 @@ namespace igl
                         core[1].set(viewer->data(i).show_faces, false);
 
                     }
-
+                    viewer->number_of_balls = 0;
                     ImGui::SameLine(core[0].viewport[2] / 2 - 220);
                     ImGui::SetCursorPosY(100);
                     ImGui::SetWindowFontScale(3.5f);

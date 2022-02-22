@@ -199,8 +199,10 @@ void SandBox::new_check_collision(int i, Eigen::Vector3d head_loc)
 		
 		if(isSecondLevel)
 			score = score + 200;
-		else
+		else {
 			score = score + 100;
+			number_of_balls++;
+		}
 
 		int sign1 = (rand() % 2) * 2 - 1;
 		int sign2 = (rand() % 2) * 2 - 1;
@@ -243,7 +245,7 @@ void SandBox::Init(const std::string &config)
 			data().line_width = 2;
 			data().set_visible(false, 1);
 			//data().SetCenterOfRotation(Eigen::Vector3d(10,0, 0));
-				
+			data().cubemapTexture = data().loadCubemap(data().faces);
 
 			
 		}
@@ -267,6 +269,7 @@ void SandBox::Init(const std::string &config)
 	mciSendString("open \"musicforgame.wav\" type mpegvideo alias wav", NULL, 0, NULL);
 
 	mciSendString("play wav", NULL, 0, NULL);
+	
 }
 
 void SandBox::init_skinning_stuff()
@@ -345,27 +348,52 @@ void SandBox::update_next_pose()
 	Eigen::Vector3d axis;
 	double angle = 0;
 
+	if (isCameraUp) {
+		switch (_dir)
+		{
+		case up:
+			axis << 1, 0, 0;
+			angle = igl::PI / 10;
+			break;
+		case down:
+			axis << 1, 0, 0;
+			angle = -igl::PI / 10;
+			break;
+		case right:
+			axis << 0, 1, 0;
+			angle = igl::PI / 10;
+			break;
+		case left:
+			axis << 0, 1, 0;
+			angle = -igl::PI / 10;
+			break;
+		case NONE:
+			return;
+		}
+	}
+	else {
+		switch (_dir)
+		{
+		case up:
+			axis << 1, 0, 0;
+			angle = -igl::PI / 10;
+			break;
+		case down:
+			axis << 1, 0, 0;
+			angle = igl::PI / 10;
+			break;
+		case right:
+			axis << 0, 1, 0;
+			angle = -igl::PI / 10;
+			break;
+		case left:
+			axis << 0, 1, 0;
+			angle = igl::PI / 10;
+			break;
+		case NONE:
+			return;
+		}
 
-	switch (_dir)
-	{
-	case up:
-		axis << 1, 0, 0;
-		angle = igl::PI / 10;
-		break;
-	case down:
-		axis << 1, 0, 0;
-		angle = -igl::PI / 10;
-		break;
-	case right:
-		axis << 0, 1, 0;
-		angle = igl::PI / 10;
-		break;
-	case left:
-		axis << 0, 1, 0;
-		angle = -igl::PI / 10;
-		break;
-	case NONE:
-		return;
 	}
 	
 
@@ -401,7 +429,7 @@ void SandBox::move_balls()
 		}
 		else
 			move_dir = Eigen::Vector3d::UnitZ();
-		data_list[i].MyTranslate(move_dir * ( sign * 0.5), true);
+		data_list[i].MyTranslate(move_dir * ( sign * 0.35), true);
 	}
 	border += sign;
 }
@@ -501,7 +529,7 @@ void SandBox::Animate(igl::opengl::ViewerCore &core)
 
 		}
 		pre_draw();
-		data(snake_pos).MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.27, true);
+		data(snake_pos).MyTranslate((CT.row(BE(0, 0)) - CT.row(BE(0, 1))).normalized() * 0.24, true);
 		
 		if (anim_t > 1)
 		{

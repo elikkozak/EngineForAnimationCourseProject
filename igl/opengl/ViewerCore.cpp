@@ -278,8 +278,8 @@ IGL_INLINE void igl::opengl::ViewerCore::drawCubeMap(
 
     data.meshgl.bind_mesh();
     data.meshgl.bind_cubemap();
-    unsigned int cubemapTexture = data.loadCubemap(data.faces);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    ;
+    glBindTexture(GL_TEXTURE_CUBE_MAP, data.cubemapTexture);
 
 
     // Initialize uniform

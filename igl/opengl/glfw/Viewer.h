@@ -146,6 +146,8 @@ public:
 
     std::vector<ViewerData> data_list;
     std::vector<Joint> joint_list;
+
+    int number_of_balls = 0;
 	
 	std::vector<int> parents;
 
